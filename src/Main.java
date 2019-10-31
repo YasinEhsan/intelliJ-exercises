@@ -1,32 +1,66 @@
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import com.sun.source.tree.Tree;
+
+import java.beans.PropertyEditorSupport;
+import java.lang.reflect.Array;
+import java.util.*;
 
 public class Main {
 
-    public static boolean subarraySum(int[] nums, int sum) {
-        /*PLAN
-            - init currSum counter, hashmap
-            - increament currsum with index in loop
-            - if currsum - sum is a key return true
-            - else create key: currsum value: index
-            - exit loop return false
-            - BTW in out if statment if we print map(cursum-sum) + 1 and index we get range of the subarray
+
+//     * Definition for a binary tree node.
+    public class TreeNode {
+         int val;
+         TreeNode left;
+         TreeNode right;
+         TreeNode(int x) { val = x; }
+     }
+
+
+    // Encodes a tree to a single string.
+    public String serialize(TreeNode root) {
+        /*Plan
+            - recurse we need base case if node is null
+            - pre order traversal will be NLR print left right
+            - however we are appending to a string thus we need left and right first
+            - when we return we return like root.val + left + right
+            - we need a way to keep track of sperate chracters like commas
          */
 
-        int currSum = 0;
-        Map<Integer, Integer> map = new HashMap<>();
-        for(int i = 0; i < nums.length; i++){
-            currSum += nums[i];
-            if(map.containsKey(currSum - sum)){
-                System.out.printf("range: %d - %d", map.get(currSum - sum) + 1, i );
-                return true;
-            }
+        if(root == null)
+            return "NULL,";
 
-            map.put(currSum, i);
-        }
-        return false;
+        String leftNode = serialize(root.left);
+        String rightNode = serialize(root.right);
+        return root.val + "," + leftNode + rightNode;
+
+    }
+
+    // Decodes your encoded data to tree.
+    public TreeNode deserialize(String data) {
+        /*Plan
+            - we need to store the values of treenode that we can acesss queue works
+            - so lets store the values of string seprated by comma into queue
+            - we can use a helper function to to the meat of deserilize
+            - the helper fuction takes in a queue if node is "null" returns null
+            - elif creats a new tree node with that val
+            - then calls deserialize on left tree node and right trre node
+            - lastly returns root
+         */
+
+        Queue<String> nodeFile = new LinkedList<>();
+        nodeFile.addAll(Arrays.asList(data.split(",")));
+        return helper(nodeFile);
+    }
+
+    private TreeNode helper(Queue<String> nodeFile){
+        String parsed = nodeFile.poll();
+        if(parsed.equals("NULL"))
+            return null;
+        TreeNode currNode = new TreeNode(Integer.valueOf(parsed));
+        currNode.left = helper(nodeFile);
+        currNode.right = helper(nodeFile);
+        return currNode;
+
     }
 
 
@@ -35,7 +69,7 @@ public class Main {
     public static void main(String[] args){
         int[] a = {3,2,7,1,6}; //2 + 7 + 1
 
-        System.out.println(subarraySum(a, 10)); //prints 1-3 (range)
+        System.out.println(a); //prints 1-3 (range)
     }
 
 }
